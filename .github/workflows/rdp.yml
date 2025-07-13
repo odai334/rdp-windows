@@ -6,11 +6,11 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - name: Install LocalXpose
+      - name: Download LocalXpose Portable
         run: |
-          Invoke-WebRequest https://localxpose.io/releases/lxsetup.exe -OutFile lxsetup.exe
-          Start-Process -FilePath .\lxsetup.exe -ArgumentList '/S' -Wait
-          echo "LocalXpose Installed"
+          Invoke-WebRequest https://localxpose.io/releases/lx-windows-amd64.zip -OutFile lx.zip
+          Expand-Archive lx.zip -DestinationPath .
+          echo "LocalXpose downloaded"
 
       - name: Enable RDP + Start Tunnel
         run: |
@@ -18,5 +18,5 @@ jobs:
           net localgroup administrators kamel123 /add
           Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' -Value 0
           Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
-          & "$env:LOCALAPPDATA\Programs\localxpose\lx.exe" auth 4szdbKgf1A38QVPw2KDtvJeiEQvojc8gs1f5FI9c
-          & "$env:LOCALAPPDATA\Programs\localxpose\lx.exe" tunnel tcp --port 3389 --log stdout
+          .\lx.exe auth 4szdbKgf1A38QVPw2KDtvJeiEQvojc8gs1f5FI9c
+          .\lx.exe tunnel tcp --port 3389 --log stdout
