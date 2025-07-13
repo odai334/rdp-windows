@@ -1,0 +1,22 @@
+name: RDP with LocalXpose
+
+on: [workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Download and Install LocalXpose
+        run: |
+          Invoke-WebRequest https://localxpose.io/releases/lxsetup.exe -OutFile lxsetup.exe
+          Start-Process lxsetup.exe -Wait
+          echo "LocalXpose Installed"
+
+      - name: Setup RDP and Tunnel
+        run: |
+          net user kamel123 MyStrong123 /add
+          net localgroup administrators kamel123 /add
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' -Value 0
+          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+          & "$env:LOCALAPPDATA\Programs\localxpose\lx.exe" auth 4szdbKgf1A38QVPw2KDtvJeiEQvojc8gs1f5FI9c
+          & "$env:LOCALAPPDATA\Programs\localxpose\lx.exe" tunnel tcp --port 3389
